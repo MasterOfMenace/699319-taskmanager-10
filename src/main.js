@@ -1,3 +1,5 @@
+`use strict`
+
 const TASK_COUNT = 3;
 
 const createMenuTemplate = () => {
@@ -401,7 +403,7 @@ const createLoadMoreButton = () => {
 
 const renderElement = (container, template, place = `beforeend`) => {
   container.insertAdjacentHTML(place, template);
-}
+};
 
 const pageMain = document.querySelector(`.main`);
 const pageControl = pageMain.querySelector(`.main__control`);
