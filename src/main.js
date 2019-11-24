@@ -1,4 +1,4 @@
-`use strict`
+'use strict'
 
 const TASK_COUNT = 3;
 
@@ -10,9 +10,7 @@ const createMenuTemplate = () => {
     id="control__new-task"
     class="control__input visually-hidden"
   />
-  <label for="control__new-task" class="control__label control__label--new-task"
-    >+ ADD NEW TASK</label
-  >
+  <label for="control__new-task" class="control__label control__label--new-task">+ ADD NEW TASK</label>
   <input
     type="radio"
     name="control"
