@@ -35,4 +35,28 @@ const formatTime = (date) => {
   return `${hours}:${minutes} ${interval}`;
 };
 
-export {getBoolean, getRandomValue, getRandomDate, formatTime};
+const RenderPosition = {
+  AFTERBEGIN: `afterbegin`,
+  BEFOREEND: `beforeend`,
+};
+
+const renderElement = (container, element, place) => {
+  // debugger;
+  switch (place) {
+    case RenderPosition.AFTERBEGIN:
+      container.prepend(element);
+      break;
+    case RenderPosition.BEFOREEND:
+      container.append(element);
+  }
+};
+
+const createElement = (template) => {
+  const element = document.createElement(`div`);
+  element.innerHTML = template;
+  // console.log(element);
+
+  return element.firstChild;
+};
+
+export {getBoolean, getRandomValue, getRandomDate, formatTime, RenderPosition, renderElement, createElement};

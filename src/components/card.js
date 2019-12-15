@@ -1,5 +1,5 @@
 import {MonthNames} from '../constants.js';
-import {formatTime} from '../utils.js';
+import {formatTime, createElement} from '../utils.js';
 
 const createHashtagsMarkup = (hashtags) => {
   return hashtags.map((hashtag) => {
@@ -13,7 +13,7 @@ const createHashtagsMarkup = (hashtags) => {
   }).join(`\n`);
 };
 
-const generateCardTemplate = (card) => {
+const createCardTemplate = (card) => {
   const {description, tags, dueDate, color, repeatingDays} = card; // получаем из объекта
 
   const isExpired = dueDate instanceof Date && dueDate < Date.now(); // проверяем на истекшую дату
@@ -80,4 +80,27 @@ const generateCardTemplate = (card) => {
   );
 };
 
-export {generateCardTemplate};
+export default class CardComponent {
+  constructor(card) {
+    this._card = card;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createCardTemplate(this._card);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+// export {generateCardTemplate};
