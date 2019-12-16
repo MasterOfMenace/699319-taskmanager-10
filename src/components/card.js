@@ -13,8 +13,8 @@ const createHashtagsMarkup = (hashtags) => {
   }).join(`\n`);
 };
 
-const createCardTemplate = (card) => {
-  const {description, tags, dueDate, color, repeatingDays} = card; // получаем из объекта
+const createTaskTemplate = (task) => {
+  const {description, tags, dueDate, color, repeatingDays} = task; // получаем из объекта
 
   const isExpired = dueDate instanceof Date && dueDate < Date.now(); // проверяем на истекшую дату
   const isDateShowing = !!dueDate; // если даты нет, не показываем
@@ -80,14 +80,14 @@ const createCardTemplate = (card) => {
   );
 };
 
-export default class CardComponent {
-  constructor(card) {
-    this._card = card;
+export default class TaskComponent {
+  constructor(task) {
+    this._task = task;
     this._element = null;
   }
 
   getTemplate() {
-    return createCardTemplate(this._card);
+    return createTaskTemplate(this._task);
   }
 
   getElement() {
@@ -102,5 +102,3 @@ export default class CardComponent {
     this._element = null;
   }
 }
-
-// export {generateCardTemplate};

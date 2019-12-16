@@ -1,5 +1,5 @@
 import {MonthNames, Colors, Days} from '../constants.js';
-import {formatTime} from '../utils.js';
+import {formatTime, createElement} from '../utils.js';
 
 const createColorsMarkup = (colors, currentColor) => {
   return colors.map((color) => {
@@ -62,8 +62,8 @@ const createHashtagsMarkup = (tags) => {
   }).join(`\n`);
 };
 
-const createCardEditFormTemplate = (card) => {
-  const {description, tags, dueDate, color, repeatingDays} = card;
+const createTaskEditFormTemplate = (task) => {
+  const {description, tags, dueDate, color, repeatingDays} = task;
 
   const isExpired = dueDate instanceof Date && dueDate < Date.now();
   const isDateShowing = !!dueDate;
@@ -163,4 +163,25 @@ const createCardEditFormTemplate = (card) => {
   );
 };
 
-export {createCardEditFormTemplate};
+export default class TaskEditFormComponent {
+  constructor(task) {
+    this._task = task;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createTaskEditFormTemplate(this._task);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

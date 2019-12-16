@@ -3,8 +3,6 @@ const getBoolean = () => {
 };
 
 const getRandomNumber = (min, max) => {
-  // Math.floor(Math.random() * (max - min + 1)) + min;
-  // return min + Math.floor(max * Math.random())
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
@@ -41,7 +39,6 @@ const RenderPosition = {
 };
 
 const renderElement = (container, element, place) => {
-  // debugger;
   switch (place) {
     case RenderPosition.AFTERBEGIN:
       container.prepend(element);
@@ -54,7 +51,6 @@ const renderElement = (container, element, place) => {
 const createElement = (template) => {
   const element = document.createElement(`div`);
   element.innerHTML = template;
-  // console.log(element);
 
   return element.firstChild;
 };

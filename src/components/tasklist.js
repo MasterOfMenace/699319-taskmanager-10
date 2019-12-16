@@ -33,5 +33,3 @@ export default class TaskListComponent {
     this._element = null;
   }
 }
-
-// export {createTaskListTemplate};
