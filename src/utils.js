@@ -3,8 +3,6 @@ const getBoolean = () => {
 };
 
 const getRandomNumber = (min, max) => {
-  // Math.floor(Math.random() * (max - min + 1)) + min;
-  // return min + Math.floor(max * Math.random())
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
@@ -35,4 +33,26 @@ const formatTime = (date) => {
   return `${hours}:${minutes} ${interval}`;
 };
 
-export {getBoolean, getRandomValue, getRandomDate, formatTime};
+const RenderPosition = {
+  AFTERBEGIN: `afterbegin`,
+  BEFOREEND: `beforeend`,
+};
+
+const renderElement = (container, element, place) => {
+  switch (place) {
+    case RenderPosition.AFTERBEGIN:
+      container.prepend(element);
+      break;
+    case RenderPosition.BEFOREEND:
+      container.append(element);
+  }
+};
+
+const createElement = (template) => {
+  const element = document.createElement(`div`);
+  element.innerHTML = template;
+
+  return element.firstChild;
+};
+
+export {getBoolean, getRandomValue, getRandomDate, formatTime, RenderPosition, renderElement, createElement};
