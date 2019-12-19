@@ -1,4 +1,4 @@
-import {createElement} from '../utils.js';
+import AbstractComponent from './abstract-component.js';
 
 const createTaskListTemplate = () =>
   (`<section class="board container">
@@ -12,24 +12,12 @@ const createTaskListTemplate = () =>
   </div>
 </section>`);
 
-export default class TaskListComponent {
+export default class TaskListComponent extends AbstractComponent {
   constructor() {
-    this._element = null;
+    super();
   }
 
   getTemplate() {
     return createTaskListTemplate();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
