@@ -1,4 +1,4 @@
-import {renderElement, RenderPosition} from './utils.js';
+import {renderElement, RenderPosition} from './utils/render.js';
 import {generateTasks} from './mocks/task.js';
 import {generateFilters} from './mocks/filter.js';
 
@@ -29,7 +29,7 @@ const renderTask = (task) => {
     taskListElement.replaceChild(taskComponent.getElement(), taskEditComponent.getElement());
   });
 
-  renderElement(taskListElement, taskComponent.getElement(), RenderPosition.BEFOREEND);
+  renderElement(taskListElement, taskComponent, RenderPosition.BEFOREEND);
 };
 
 const getCount = (tasks) => {
@@ -75,24 +75,24 @@ const pageControl = pageMain.querySelector(`.main__control`);
 const tasks = generateTasks(TASK_COUNT);
 const filters = generateFilters(getCount(tasks));
 
-const menu = new SiteMenu().getElement();
-const filterElement = new FilterComponent(filters).getElement();
-const boardElement = new TaskListComponent().getElement();
+const menuComponent = new SiteMenu();
+const filterComponent = new FilterComponent(filters);
+const boardComponent = new TaskListComponent();
 const loadMoreBtnComponent = new LoadMoreButtonComponent();
 
-renderElement(pageControl, menu, RenderPosition.BEFOREEND);
-renderElement(pageMain, filterElement, RenderPosition.BEFOREEND);
-renderElement(pageMain, boardElement, RenderPosition.BEFOREEND);
+renderElement(pageControl, menuComponent, RenderPosition.BEFOREEND);
+renderElement(pageMain, filterComponent, RenderPosition.BEFOREEND);
+renderElement(pageMain, boardComponent, RenderPosition.BEFOREEND);
 
-const taskListElement = boardElement.querySelector(`.board__tasks`);
+const taskListElement = boardComponent.getElement().querySelector(`.board__tasks`);
 
 let nowShown = SHOW_ON_START_COUNT;
 tasks.slice(0, nowShown).forEach((task) => {
   renderTask(task);
 });
 
-renderElement(boardElement, loadMoreBtnComponent.getElement(), RenderPosition.BEFOREEND);
-const loadMoreBtn = boardElement.querySelector(`.load-more`);
+renderElement(boardComponent.getElement(), loadMoreBtnComponent, RenderPosition.BEFOREEND);
+const loadMoreBtn = boardComponent.getElement().querySelector(`.load-more`);
 
 loadMoreBtn.addEventListener(`click`, () => {
   loadMoreBtnComponent.getElement().addEventListener(`click`, () => {
