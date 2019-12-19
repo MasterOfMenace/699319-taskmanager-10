@@ -17,17 +17,15 @@ const renderTask = (task) => {
   const taskComponent = new TaskComponent(task);
   const taskEditComponent = new TaskEditFormComponent(task);
 
-  const editButton = taskComponent.getElement().querySelector(`.card__btn--edit`);
-
-  editButton.addEventListener(`click`, () => {
+  const editButtonClickHandler = () => {
     taskListElement.replaceChild(taskEditComponent.getElement(), taskComponent.getElement());
-  });
-
-  const taskEditForm = taskEditComponent.getElement().querySelector(`form`);
-
-  taskEditForm.addEventListener(`submit`, () => {
+  };
+  const formSubmitHandler = () => {
     taskListElement.replaceChild(taskComponent.getElement(), taskEditComponent.getElement());
-  });
+  };
+
+  taskComponent.setEditButtonClickHandler(editButtonClickHandler);
+  taskEditComponent.setFormSubmitHandler(formSubmitHandler);
 
   renderElement(taskListElement, taskComponent, RenderPosition.BEFOREEND);
 };
@@ -92,17 +90,16 @@ tasks.slice(0, nowShown).forEach((task) => {
 });
 
 renderElement(boardComponent.getElement(), loadMoreBtnComponent, RenderPosition.BEFOREEND);
-const loadMoreBtn = boardComponent.getElement().querySelector(`.load-more`);
 
-loadMoreBtn.addEventListener(`click`, () => {
-  loadMoreBtnComponent.getElement().addEventListener(`click`, () => {
-    tasks.slice(nowShown, nowShown = nowShown + SHOW_BY_BUTTON_COUNT).forEach((task) => {
-      renderTask(task);
-    });
-
-    if (nowShown >= TASK_COUNT) {
-      loadMoreBtnComponent.getElement().remove();
-      loadMoreBtnComponent.removeElement();
-    }
+const loadMoreBtnClickHandler = () => {
+  tasks.slice(nowShown, nowShown = nowShown + SHOW_BY_BUTTON_COUNT).forEach((task) => {
+    renderTask(task);
   });
-});
+
+  if (nowShown >= TASK_COUNT) {
+    loadMoreBtnComponent.getElement().remove();
+    loadMoreBtnComponent.removeElement();
+  }
+};
+
+loadMoreBtnComponent.setClickHandler(loadMoreBtnClickHandler);
