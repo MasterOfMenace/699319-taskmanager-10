@@ -2,6 +2,7 @@ import AbstractComponent from './abstract-component.js';
 
 const createFilterMarkup = (filter, isChecked) => {
   const {name, count} = filter;
+  const isDisabled = count === 0;
 
   return (
     `<input
@@ -10,6 +11,7 @@ const createFilterMarkup = (filter, isChecked) => {
     class="filter__input visually-hidden"
     name="filter"
     ${isChecked ? `checked` : ``}
+    ${isDisabled ? `disabled` : ``}
   />
   <label for="filter__${name}" class="filter__label">
     ${name.toUpperCase()} <span class="filter__${name}-count">${count}</span></label
