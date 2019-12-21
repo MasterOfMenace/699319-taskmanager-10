@@ -1,7 +1,7 @@
 import {Hashtags, Colors} from '../constants.js';
-import {getBoolean} from '../utils.js';
-import {getRandomValue} from '../utils.js';
-import {getRandomDate} from '../utils.js';
+import {getBoolean} from '../utils/utils.js';
+import {getRandomValue} from '../utils/utils.js';
+import {getRandomDate} from '../utils/utils.js';
 
 
 const DescriptionItems = [`Изучить теорию`, `Сделать домашку`, `Пройти интенсив на соточку`];

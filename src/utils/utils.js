@@ -33,26 +33,4 @@ const formatTime = (date) => {
   return `${hours}:${minutes} ${interval}`;
 };
 
-const RenderPosition = {
-  AFTERBEGIN: `afterbegin`,
-  BEFOREEND: `beforeend`,
-};
-
-const renderElement = (container, element, place) => {
-  switch (place) {
-    case RenderPosition.AFTERBEGIN:
-      container.prepend(element);
-      break;
-    case RenderPosition.BEFOREEND:
-      container.append(element);
-  }
-};
-
-const createElement = (template) => {
-  const element = document.createElement(`div`);
-  element.innerHTML = template;
-
-  return element.firstChild;
-};
-
-export {getBoolean, getRandomValue, getRandomDate, formatTime, RenderPosition, renderElement, createElement};
+export {getBoolean, getRandomValue, getRandomDate, formatTime};
