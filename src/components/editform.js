@@ -1,6 +1,6 @@
 import {MonthNames, Colors, Days} from '../constants.js';
 import {formatTime} from '../utils/utils.js';
-import AbstractComponent from './abstract-component.js';
+import AbstractSmartComponent from './abstract-smart-component.js';
 
 const createColorsMarkup = (colors, currentColor) => {
   return colors.map((color) => {
@@ -63,21 +63,24 @@ const createHashtagsMarkup = (tags) => {
   }).join(`\n`);
 };
 
-const createTaskEditFormTemplate = (task) => {
-  const {description, tags, dueDate, color, repeatingDays} = task;
-
+const createTaskEditFormTemplate = (task, options = {}) => {
+  const {description, tags, dueDate, color} = task;
+  const {isDateShowing, isRepeatingTask, currentRepeatingDays} = options;
   const isExpired = dueDate instanceof Date && dueDate < Date.now();
-  const isDateShowing = !!dueDate;
+  // const isDateShowing = !!dueDate;
 
   const date = isDateShowing ? `${dueDate.getDate()} ${MonthNames[dueDate.getMonth()]}` : ``;
   const time = isDateShowing ? `${formatTime(dueDate)}` : ``;
 
-  const isRepeating = Object.values(repeatingDays).some(Boolean);
-  const repeatClass = isRepeating ? `card--repeat` : ``;
+  const isRepeating = (repeatingDays) => Object.values(repeatingDays).some(Boolean);
+
+  const isBlockSaveButton = (isDateShowing && isRepeatingTask) || (isRepeatingTask && !isRepeating(currentRepeatingDays));
+
+  const repeatClass = isRepeatingTask ? `card--repeat` : ``;
   const deadlineClass = isExpired ? `card--deadline` : ``;
 
   const colors = createColorsMarkup(Colors, color);
-  const repeatingDaysMarkup = createRepeatingDaysMarkup(Days, repeatingDays);
+  const repeatingDaysMarkup = createRepeatingDaysMarkup(Days, currentRepeatingDays);
   const hashtagsMarkup = createHashtagsMarkup(tags);
 
   return (
@@ -120,10 +123,10 @@ const createTaskEditFormTemplate = (task) => {
                 </fieldset>` : ``}
 
               <button class="card__repeat-toggle" type="button">
-                repeat:<span class="card__repeat-status">${isRepeating ? `yes` : `no`}</span>
+                repeat:<span class="card__repeat-status">${isRepeatingTask ? `yes` : `no`}</span>
               </button>
 
-              ${isRepeating ? `<fieldset class="card__repeat-days">
+              ${isRepeatingTask ? `<fieldset class="card__repeat-days">
                   <div class="card__repeat-days-inner">
                   ${repeatingDaysMarkup}
                   </div>
@@ -155,7 +158,7 @@ const createTaskEditFormTemplate = (task) => {
         </div>
 
         <div class="card__status-btns">
-          <button class="card__save" type="submit">save</button>
+          <button class="card__save" type="submit" ${isBlockSaveButton ? `disabled` : ``}>save</button>
           <button class="card__delete" type="button">delete</button>
         </div>
       </div>
@@ -164,17 +167,64 @@ const createTaskEditFormTemplate = (task) => {
   );
 };
 
-export default class TaskEditFormComponent extends AbstractComponent {
+export default class TaskEditFormComponent extends AbstractSmartComponent {
   constructor(task) {
     super();
     this._task = task;
+    this._isDateShowing = !!task.dueDate;
+    this._isRepeatingTask = Object.values(task.repeatingDays).some(Boolean);
+    this._currentRepeatingDays = Object.assign({}, task.repeatingDays);
   }
 
   getTemplate() {
-    return createTaskEditFormTemplate(this._task);
+    return createTaskEditFormTemplate(this._task, {
+      isDateShowing: this._isDateShowing,
+      isRepeatingTask: this._isRepeatingTask,
+      currentRepeatingDays: this._currentRepeatingDays,
+    });
   }
 
   setFormSubmitHandler(handler) {
     this.getElement().querySelector(`form`).addEventListener(`submit`, handler);
+  }
+
+  recoveryListeners() {
+    this._subscribeOnEvents();
+  }
+
+  reset() {
+    const task = this._task;
+
+    this._isDateShowing = !!task.dueDate;
+    this._isRepeatingTask = Object.values(task.repeatingDays).some(Boolean);
+    this._currentRepeatingDays = Object.assign({}, task.repeatingDays);
+
+    this.rerender();
+  }
+
+  rerender() {
+    super.rerender();
+  }
+
+  _subscribeOnEvents() {
+    const element = this.getElement();
+
+    element.querySelector(`.card__date-deadline-toggle`).addEventListener(`click`, () => {
+      this.isDateShowing = !this.isDateShowing;
+      this.rerender();
+    });
+
+    element.querySelector(`.card__repeat-toggle`).addEventListener(`click`, () => {
+      this.isRepeatingTask = !this.isRepeatingTask;
+      this.rerender();
+    });
+
+    const repeatingDays = element.querySelector(`.card__repeat-days`);
+    if (repeatingDays) {
+      repeatingDays.addEventListener(`change`, (evt) => {
+        this.currentRepeatingDays[evt.target.value] = evt.target.checked;
+        this.rerender();
+      });
+    }
   }
 }
