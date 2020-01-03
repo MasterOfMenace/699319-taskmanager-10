@@ -15,7 +15,7 @@ const createHashtagsMarkup = (hashtags) => {
 };
 
 const createTaskTemplate = (task) => {
-  const {description, tags, dueDate, color, repeatingDays} = task; // получаем из объекта
+  const {description, tags, dueDate, color, repeatingDays, isFavorite, isArchive} = task; // получаем из объекта
 
   const isExpired = dueDate instanceof Date && dueDate < Date.now(); // проверяем на истекшую дату
   const isDateShowing = !!dueDate; // если даты нет, не показываем
@@ -27,6 +27,8 @@ const createTaskTemplate = (task) => {
 
   const repeatClass = Object.values(repeatingDays).some(Boolean) ? `card--repeat` : ``;
   const deadlineClass = isExpired ? `card--deadline` : ``;
+  const favorite = isFavorite ? `card__btn--disabled` : ``;
+  const archived = isArchive ? `card__btn--disabled` : ``;
 
   return (
     `<article class="card card--${color} ${repeatClass} ${deadlineClass}">
@@ -36,12 +38,12 @@ const createTaskTemplate = (task) => {
           <button type="button" class="card__btn card__btn--edit">
             edit
           </button>
-          <button type="button" class="card__btn card__btn--archive">
+          <button type="button" class="card__btn card__btn--archive ${archived}">
             archive
           </button>
           <button
             type="button"
-            class="card__btn card__btn--favorites card__btn--disabled"
+            class="card__btn card__btn--favorites ${favorite}"
           >
             favorites
           </button>
@@ -93,5 +95,13 @@ export default class TaskComponent extends AbstractComponent {
 
   setEditButtonClickHandler(handler) {
     this.getElement().querySelector(`.card__btn--edit`).addEventListener(`click`, handler);
+  }
+
+  setArchiveButtonClickHandler(handler) {
+    this.getElement().querySelector(`.card__btn--archive`).addEventListener(`click`, handler);
+  }
+
+  setFavoriteButtonClickHandler(handler) {
+    this.getElement().querySelector(`.card__btn--favorites`).addEventListener(`click`, handler);
   }
 }

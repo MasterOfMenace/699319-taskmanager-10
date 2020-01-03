@@ -17,6 +17,7 @@ const getCountForFilters = (tasks) => {
   let favCount = 0;
   let repCount = 0;
   let tagsCount = 0;
+  let archCount = 0;
 
   tasks.forEach((task) => {
     if (task.dueDate && task.dueDate < Date.now()) {
@@ -34,6 +35,9 @@ const getCountForFilters = (tasks) => {
     if (task.tags.size !== 0) {
       tagsCount++;
     }
+    if (task.isArchive) {
+      archCount++;
+    }
   });
 
   return {
@@ -43,6 +47,7 @@ const getCountForFilters = (tasks) => {
     favorites: favCount,
     repeating: repCount,
     tags: tagsCount,
+    archive: archCount,
   };
 };
 
