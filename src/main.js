@@ -21,10 +21,14 @@ const filterController = new FilterController(pageMain, tasksModel);
 filterController.render();
 
 const boardComponent = new BoardComponent();
+const boardController = new BoardController(boardComponent, tasksModel);
+
+menuComponent.getElement().querySelector(`.control__label--new-task`).addEventListener(`click`, () => {
+  boardController.createTask();
+});
 
 renderElement(pageControl, menuComponent, RenderPosition.BEFOREEND);
 renderElement(pageMain, boardComponent, RenderPosition.BEFOREEND);
 
-const boardController = new BoardController(boardComponent, tasksModel);
 
 boardController.render(tasks);

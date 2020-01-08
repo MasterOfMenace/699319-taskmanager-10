@@ -37,6 +37,22 @@ export default class TasksModel {
     return true;
   }
 
+  addTask(task) {
+    this._tasks = [].concat(task, this._tasks);
+  }
+
+  removeTask(id) {
+    const index = this._tasks.findIndex((it) => it.id === id);
+
+    if (index === -1) {
+      return false;
+    }
+
+    this._tasks = [].concat(this._tasks.slice(0, index), this._tasks.slice(index + 1));
+
+    return true;
+  }
+
   setFilterChangeHandler(handler) {
     this._filterChangeHandlers.push(handler);
   }
