@@ -67,7 +67,6 @@ const createTaskEditFormTemplate = (task, options = {}) => {
   const {description, tags, dueDate, color} = task;
   const {isDateShowing, isRepeatingTask, currentRepeatingDays} = options;
   const isExpired = dueDate instanceof Date && dueDate < Date.now();
-  // const isDateShowing = !!dueDate;
 
   const date = isDateShowing ? `${dueDate.getDate()} ${MonthNames[dueDate.getMonth()]}` : ``;
   const time = isDateShowing ? `${formatTime(dueDate)}` : ``;
@@ -174,6 +173,9 @@ export default class TaskEditFormComponent extends AbstractSmartComponent {
     this._isDateShowing = !!task.dueDate;
     this._isRepeatingTask = Object.values(task.repeatingDays).some(Boolean);
     this._currentRepeatingDays = Object.assign({}, task.repeatingDays);
+
+    this._formSubmitHandler = null;
+    this._subscribeOnEvents();
   }
 
   getTemplate() {
@@ -186,10 +188,12 @@ export default class TaskEditFormComponent extends AbstractSmartComponent {
 
   setFormSubmitHandler(handler) {
     this.getElement().querySelector(`form`).addEventListener(`submit`, handler);
+    this._formSubmitHandler = handler;
   }
 
   recoveryListeners() {
     this._subscribeOnEvents();
+    this.setFormSubmitHandler(this._formSubmitHandler);
   }
 
   reset() {
