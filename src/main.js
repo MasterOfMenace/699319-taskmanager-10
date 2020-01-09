@@ -1,7 +1,7 @@
 import {renderElement, RenderPosition} from './utils/render.js';
 import {generateTasks} from './mocks/task.js';
 
-import SiteMenu from './components/menu.js';
+import SiteMenu, {MenuItem} from './components/menu.js';
 import BoardController from './controllers/board-controller.js';
 import BoardComponent from './components/board.js';
 import TasksModel from './models/task';
@@ -23,8 +23,17 @@ filterController.render();
 const boardComponent = new BoardComponent();
 const boardController = new BoardController(boardComponent, tasksModel);
 
-menuComponent.getElement().querySelector(`.control__label--new-task`).addEventListener(`click`, () => {
-  boardController.createTask();
+menuComponent.setOnChange((menuItem) => {
+  switch (menuItem) {
+    case MenuItem.ADD_TASK:
+      menuComponent.setActiveItem(MenuItem.ADD_TASK);
+      boardController.createTask();
+      break;
+    case MenuItem.TASKS:
+      break;
+    case MenuItem.STATISTICS:
+      break;
+  }
 });
 
 renderElement(pageControl, menuComponent, RenderPosition.BEFOREEND);

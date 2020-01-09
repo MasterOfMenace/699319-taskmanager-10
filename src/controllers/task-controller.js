@@ -50,8 +50,11 @@ export default class TaskController {
     const editButtonClickHandler = () => {
       this._replaceTaskToEdit();
     };
-    const formSubmitHandler = () => {
-      this._replaceEditToTask();
+
+    const formSubmitHandler = (evt) => {
+      evt.preventDefault();
+      const data = this._taskEditComponent.getData();
+      this._onDataChange(this, task, data);
     };
 
     this._taskComponent.setEditButtonClickHandler(editButtonClickHandler);
@@ -76,6 +79,7 @@ export default class TaskController {
         if (oldTaskEditComponent && oldTaskComponent) {
           replace(this._taskComponent, oldTaskComponent);
           replace(this._taskEditComponent, oldTaskEditComponent);
+          this._replaceEditToTask();
         } else {
           renderElement(this._container, this._taskComponent, RenderPosition.BEFOREEND);
         }
@@ -106,6 +110,13 @@ export default class TaskController {
     replace(this._taskComponent, this._taskEditComponent);
 
     this._viewMode = ViewMode.DEFAULT;
+  }
+
+  destroy() {
+    this._taskComponent.getElement().remove();
+    this._taskComponent.removeElement();
+    this._taskEditComponent.getElement().remove();
+    this._taskEditComponent.removeElement();
   }
 
   setDefaultView() {

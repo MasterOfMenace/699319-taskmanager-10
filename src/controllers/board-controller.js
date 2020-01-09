@@ -87,8 +87,7 @@ export default class BoardController {
   }
 
   _removeTasks() {
-    const taskListElement = this._taskListComponent.getElement();
-    taskListElement.innerHTML = ``;
+    this._showedTasksControllers.forEach((controller) => controller.destroy());
     this._showedTasksControllers = [];
   }
 
@@ -104,25 +103,18 @@ export default class BoardController {
     if (oldData === EmptyTask) {
       this._creatingTask = null;
       if (newData === null) {
-        /**
-         * taskController.destroy();
-        this._updateTasks(this._showingTasksCount);
-         */
-        taskController.getElement().remove();
-        taskController.removeElement();
+        taskController.destroy();
+        this._removeTasks();
+        this._renderTasks(this._tasksModel.getTasks().slice(0, this._showingTasksCount));
+        this._renderLoadMoreButton();
       } else {
         this._tasksModel.addTask(newData);
         taskController.render(newData, ViewMode.DEFAULT);
 
-        const destroyedTask = this._showedTasksControllers.pop(); // что это, как это работает и зачем оно?!
-        destroyedTask.getElement().remove();
-        destroyedTask.removeElement();
-
         this._showedTasksControllers = [].concat(taskController, this._showedTasksControllers);
         this._showingTasksCount = this._showedTasksControllers.length;
       }
-    }
-    if (newData === null) {
+    } else if (newData === null) {
       this._tasksModel.removeTask(oldData.id);
       this._removeTasks();
       this._renderTasks(this._tasksModel.getTasks().slice(0, this._showingTasksCount));

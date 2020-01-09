@@ -6,6 +6,7 @@ export default class TasksModel {
     this._tasks = [];
     this._activeFilterType = FilterType.ALL;
     this._filterChangeHandlers = [];
+    this._dataChangeHandlers = [];
   }
 
   getTasks() {
@@ -34,11 +35,15 @@ export default class TasksModel {
 
     this._tasks = [].concat(this._tasks.slice(0, index), task, this._tasks.slice(index + 1));
 
+    this._dataChangeHandlers.forEach((handler) => handler());
+
     return true;
   }
 
   addTask(task) {
     this._tasks = [].concat(task, this._tasks);
+
+    this._dataChangeHandlers.forEach((handler) => handler());
   }
 
   removeTask(id) {
@@ -50,10 +55,16 @@ export default class TasksModel {
 
     this._tasks = [].concat(this._tasks.slice(0, index), this._tasks.slice(index + 1));
 
+    this._dataChangeHandlers.forEach((handler) => handler());
+
     return true;
   }
 
   setFilterChangeHandler(handler) {
     this._filterChangeHandlers.push(handler);
+  }
+
+  setDataChangeHandler(handler) {
+    this._dataChangeHandlers.push(handler);
   }
 }
