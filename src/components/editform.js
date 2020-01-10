@@ -67,7 +67,6 @@ const createTaskEditFormTemplate = (task, options = {}) => {
   const {description, tags, dueDate, color} = task;
   const {isDateShowing, isRepeatingTask, currentRepeatingDays} = options;
   const isExpired = dueDate instanceof Date && dueDate < Date.now();
-  // const isDateShowing = !!dueDate;
 
   const date = isDateShowing ? `${dueDate.getDate()} ${MonthNames[dueDate.getMonth()]}` : ``;
   const time = isDateShowing ? `${formatTime(dueDate)}` : ``;
@@ -99,6 +98,8 @@ const createTaskEditFormTemplate = (task, options = {}) => {
               class="card__text"
               placeholder="Start typing your text here..."
               name="text"
+              minlength="1"
+              maxlength="140"
             >${description}</textarea>
           </label>
         </div>
@@ -167,6 +168,26 @@ const createTaskEditFormTemplate = (task, options = {}) => {
   );
 };
 
+const parseFormData = (formData) => {
+  const repeatingDays = Days.reduce((acc, day) => {
+    acc[day] = false;
+    return acc;
+  }, {});
+
+  const date = formData.get(`date`);
+
+  return {
+    description: formData.get(`text`),
+    color: formData.get(`color`),
+    tags: formData.getAll(`hashtag`),
+    dueDate: date ? new Date(date) : null,
+    repeatingDays: formData.getAll(`repeat`).reduce((acc, it) => {
+      acc[it] = true;
+      return acc;
+    }, repeatingDays),
+  };
+};
+
 export default class TaskEditFormComponent extends AbstractSmartComponent {
   constructor(task) {
     super();
@@ -174,6 +195,10 @@ export default class TaskEditFormComponent extends AbstractSmartComponent {
     this._isDateShowing = !!task.dueDate;
     this._isRepeatingTask = Object.values(task.repeatingDays).some(Boolean);
     this._currentRepeatingDays = Object.assign({}, task.repeatingDays);
+
+    this._formSubmitHandler = null;
+    this._deleteButtonClickHandler = null;
+    this._subscribeOnEvents();
   }
 
   getTemplate() {
@@ -184,12 +209,26 @@ export default class TaskEditFormComponent extends AbstractSmartComponent {
     });
   }
 
+  getData() {
+    const form = this.getElement().querySelector(`.card__form`);
+    const formData = new FormData(form);
+    return parseFormData(formData);
+  }
+
   setFormSubmitHandler(handler) {
     this.getElement().querySelector(`form`).addEventListener(`submit`, handler);
+    this._formSubmitHandler = handler;
+  }
+
+  setDeleteButtonClickHandler(handler) {
+    this.getElement().querySelector(`.card__delete`).addEventListener(`click`, handler);
+    this._deleteButtonClickHandler = handler;
   }
 
   recoveryListeners() {
     this._subscribeOnEvents();
+    this.setFormSubmitHandler(this._formSubmitHandler);
+    this.setDeleteButtonClickHandler(this._deleteButtonClickHandler);
   }
 
   reset() {

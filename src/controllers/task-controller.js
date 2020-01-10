@@ -1,10 +1,30 @@
 import {renderElement, RenderPosition, replace} from '../utils/render';
 import TaskComponent from "../components/card";
 import TaskEditFormComponent from "../components/editform";
+import {Colors} from '../constants';
 
-const ViewMode = {
+export const ViewMode = {
+  ADDING: `adding`,
   DEFAULT: `default`,
   EDIT: `edit`
+};
+
+export const EmptyTask = {
+  description: ``,
+  dueDate: null,
+  repeatingDays: {
+    'mo': false,
+    'tu': false,
+    'we': false,
+    'th': false,
+    'fr': false,
+    'sa': false,
+    'su': false,
+  },
+  tags: [],
+  color: Colors[0],
+  isFavorite: false,
+  isArchive: false,
 };
 
 export default class TaskController {
@@ -19,17 +39,22 @@ export default class TaskController {
     this._taskEditComponent = null;
   }
 
-  render(task) {
+  render(task, mode) {
     const oldTaskComponent = this._taskComponent;
     const oldTaskEditComponent = this._taskEditComponent;
+
+    this._viewMode = mode;
     this._taskComponent = new TaskComponent(task);
     this._taskEditComponent = new TaskEditFormComponent(task);
 
     const editButtonClickHandler = () => {
       this._replaceTaskToEdit();
     };
-    const formSubmitHandler = () => {
-      this._replaceEditToTask();
+
+    const formSubmitHandler = (evt) => {
+      evt.preventDefault();
+      const data = this._taskEditComponent.getData();
+      this._onDataChange(this, task, data);
     };
 
     this._taskComponent.setEditButtonClickHandler(editButtonClickHandler);
@@ -47,11 +72,27 @@ export default class TaskController {
       }));
     });
 
-    if (oldTaskEditComponent && oldTaskComponent) {
-      replace(this._taskComponent, oldTaskComponent);
-      replace(this._taskEditComponent, oldTaskEditComponent);
-    } else {
-      renderElement(this._container, this._taskComponent, RenderPosition.BEFOREEND);
+    this._taskEditComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, task, null));
+
+    switch (mode) {
+      case ViewMode.DEFAULT:
+        if (oldTaskEditComponent && oldTaskComponent) {
+          replace(this._taskComponent, oldTaskComponent);
+          replace(this._taskEditComponent, oldTaskEditComponent);
+          this._replaceEditToTask();
+        } else {
+          renderElement(this._container, this._taskComponent, RenderPosition.BEFOREEND);
+        }
+        break;
+      case ViewMode.ADDING:
+        if (oldTaskEditComponent && oldTaskComponent) {
+          oldTaskComponent.getElement().remove();
+          oldTaskComponent.removeElement();
+          oldTaskEditComponent.getElement().remove();
+          oldTaskEditComponent.removeElement();
+        }
+        renderElement(this._container, this._taskEditComponent, RenderPosition.AFTERBEGIN);
+        break;
     }
   }
 
@@ -69,6 +110,13 @@ export default class TaskController {
     replace(this._taskComponent, this._taskEditComponent);
 
     this._viewMode = ViewMode.DEFAULT;
+  }
+
+  destroy() {
+    this._taskComponent.getElement().remove();
+    this._taskComponent.removeElement();
+    this._taskEditComponent.getElement().remove();
+    this._taskEditComponent.removeElement();
   }
 
   setDefaultView() {

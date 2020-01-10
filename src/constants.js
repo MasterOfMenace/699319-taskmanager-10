@@ -19,4 +19,14 @@ const MonthNames = [
   `December`,
 ];
 
-export {Hashtags, Days, Colors, MonthNames};
+const FilterType = {
+  ALL: `all`,
+  OVERDUE: `overdue`,
+  TODAY: `today`,
+  FAVORITES: `favorites`,
+  REPEATING: `repeating`,
+  TAGS: `tags`,
+  ARCHIVE: `archive`
+};
+
+export {Hashtags, Days, Colors, MonthNames, FilterType};
