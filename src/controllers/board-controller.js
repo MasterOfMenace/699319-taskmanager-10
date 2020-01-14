@@ -4,6 +4,7 @@ import TaskController, {EmptyTask, ViewMode} from '../controllers/task-controlle
 import TaskListComponent from '../components/tasklist.js';
 import LoadMoreButtonComponent from '../components/loadmorebtn.js';
 import SortComponent from '../components/sort.js';
+import NoTasksComponent from '../components/no-tasks.js';
 
 const SHOW_ON_START_COUNT = 8;
 const SHOW_BY_BUTTON_COUNT = 8;
@@ -23,6 +24,7 @@ export default class BoardController {
     this._tasksModel = tasksModel;
     this._showedTasksControllers = [];
     this._showingTasksCount = SHOW_ON_START_COUNT;
+    this._noTasksComponent = new NoTasksComponent();
     this._sortComponent = new SortComponent();
     this._taskListComponent = new TaskListComponent();
     this._loadMoreButtonComponent = new LoadMoreButtonComponent();
@@ -37,6 +39,12 @@ export default class BoardController {
   render() {
     const container = this._container.getElement();
     const tasks = this._tasksModel.getTasks();
+    const isAllTasksArchived = tasks.every((task) => task.isArchive);
+
+    if (isAllTasksArchived) {
+      renderElement(container, this._noTasksComponent, RenderPosition.BEFOREEND);
+      return;
+    }
 
     renderElement(container, this._sortComponent, RenderPosition.BEFOREEND);
     renderElement(container, this._taskListComponent, RenderPosition.BEFOREEND);
