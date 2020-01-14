@@ -37,6 +37,8 @@ export default class TaskController {
     this._onViewChange = onViewChange;
     this._taskComponent = null;
     this._taskEditComponent = null;
+
+    this._onEscKeyDown = this._onEscKeyDown.bind(this);
   }
 
   render(task, mode) {
@@ -49,6 +51,7 @@ export default class TaskController {
 
     const editButtonClickHandler = () => {
       this._replaceTaskToEdit();
+      document.addEventListener(`keydown`, this._onEscKeyDown);
     };
 
     const formSubmitHandler = (evt) => {
@@ -91,6 +94,7 @@ export default class TaskController {
           oldTaskEditComponent.getElement().remove();
           oldTaskEditComponent.removeElement();
         }
+        document.addEventListener(`keydown`, this._onEscKeyDown);
         renderElement(this._container, this._taskEditComponent, RenderPosition.AFTERBEGIN);
         break;
     }
@@ -110,6 +114,18 @@ export default class TaskController {
     replace(this._taskComponent, this._taskEditComponent);
 
     this._viewMode = ViewMode.DEFAULT;
+    document.removeEventListener(`keydown`, this._onEscKeyDown);
+  }
+
+  _onEscKeyDown(evt) {
+    const isEscPress = evt.key === `Escape` || evt.key === `Esc`;
+
+    if (isEscPress) {
+      if (this._viewMode === ViewMode.ADDING) {
+        this._onDataChange(this, EmptyTask, null);
+      }
+      this._replaceEditToTask();
+    }
   }
 
   destroy() {
@@ -117,6 +133,7 @@ export default class TaskController {
     this._taskComponent.removeElement();
     this._taskEditComponent.getElement().remove();
     this._taskEditComponent.removeElement();
+    document.removeEventListener(`keydown`, this._onEscKeyDown);
   }
 
   setDefaultView() {
