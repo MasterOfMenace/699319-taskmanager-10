@@ -199,8 +199,10 @@ export default class TaskEditFormComponent extends AbstractSmartComponent {
     this._isRepeatingTask = Object.values(task.repeatingDays).some(Boolean);
     this._currentRepeatingDays = Object.assign({}, task.repeatingDays);
 
+    this._flatpickr = null;
     this._formSubmitHandler = null;
     this._deleteButtonClickHandler = null;
+    this._applyFlatpickr();
     this._subscribeOnEvents();
   }
 
@@ -246,6 +248,25 @@ export default class TaskEditFormComponent extends AbstractSmartComponent {
 
   rerender() {
     super.rerender();
+
+    this._applyFlatpickr();
+  }
+
+  _applyFlatpickr() {
+    if (this._flatpickr) {
+      this._flatpickr.destroy();
+      this._flatpickr = null;
+    }
+
+    if (this._isDateShowing) {
+      const dateElement = this.getElement().querySelector(`.card__date`);
+
+      this._flatpickr = flatpickr(dateElement, {
+        altInput: true,
+        allowInput: true,
+        defaultDate: this._task.dueDate,
+      });
+    }
   }
 
   _subscribeOnEvents() {
