@@ -1,6 +1,9 @@
 import {MonthNames, Colors, Days} from '../constants.js';
 import {formatTime} from '../utils/utils.js';
 import AbstractSmartComponent from './abstract-smart-component.js';
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
+import 'flatpickr/dist/themes/light.css';
 
 const createColorsMarkup = (colors, currentColor) => {
   return colors.map((color) => {

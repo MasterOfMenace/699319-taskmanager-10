@@ -12,5 +12,13 @@ module.exports = {
     contentBase: path.join(__dirname, `public`),
     compress: true,
     watchContentBase: true
-  }
+  },
+  module: {
+    rules: [
+      {
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader'],
+      },
+    ],
+  },
 };
