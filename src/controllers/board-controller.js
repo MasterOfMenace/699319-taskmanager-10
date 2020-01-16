@@ -3,7 +3,7 @@ import {renderElement, RenderPosition} from '../utils/render.js';
 import TaskController, {EmptyTask, ViewMode} from '../controllers/task-controller';
 import TaskListComponent from '../components/tasklist.js';
 import LoadMoreButtonComponent from '../components/loadmorebtn.js';
-import SortComponent from '../components/sort.js';
+import SortComponent, {SortType} from '../components/sort.js';
 import NoTasksComponent from '../components/no-tasks.js';
 
 const SHOW_ON_START_COUNT = 8;
@@ -52,6 +52,33 @@ export default class BoardController {
     this._renderTasks(tasks.slice(0, this._showingTasksCount));
 
     this._renderLoadMoreButton();
+
+    this._sortComponent.setSortTypeChangeHandler((sortType) => {
+      let sortedTasks = [];
+
+      switch (sortType) {
+        case SortType.DEFAULT:
+          this._showingTasksCount = SHOW_ON_START_COUNT;
+          sortedTasks = tasks.slice(0, this._showingTasksCount);
+          break;
+        case SortType.DATE_UP:
+          sortedTasks = tasks.slice().sort((a, b) => a.dueDate - b.dueDate);
+          break;
+        case SortType.DATE_DOWN:
+          sortedTasks = tasks.slice().sort((a, b) => b.dueDate - a.dueDate);
+      }
+
+      this._removeTasks();
+      this._renderTasks(sortedTasks);
+
+      if (sortType === SortType.DEFAULT) {
+        this._renderLoadMoreButton();
+      } else {
+        this._loadMoreButtonComponent.getElement().remove();
+        this._loadMoreButtonComponent.removeElement();
+      }
+
+    });
   }
 
   _renderLoadMoreButton() {
