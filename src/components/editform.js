@@ -1,6 +1,9 @@
-import {MonthNames, Colors, Days} from '../constants.js';
-import {formatTime} from '../utils/utils.js';
+import {Colors, Days} from '../constants.js';
+import {formatTime, formatDate} from '../utils/utils.js';
 import AbstractSmartComponent from './abstract-smart-component.js';
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
+import 'flatpickr/dist/themes/light.css';
 
 const createColorsMarkup = (colors, currentColor) => {
   return colors.map((color) => {
@@ -68,8 +71,8 @@ const createTaskEditFormTemplate = (task, options = {}) => {
   const {isDateShowing, isRepeatingTask, currentRepeatingDays} = options;
   const isExpired = dueDate instanceof Date && dueDate < Date.now();
 
-  const date = isDateShowing ? `${dueDate.getDate()} ${MonthNames[dueDate.getMonth()]}` : ``;
-  const time = isDateShowing ? `${formatTime(dueDate)}` : ``;
+  const date = (isDateShowing && dueDate) ? formatDate(dueDate) : ``;
+  const time = (isDateShowing && dueDate) ? formatTime(dueDate) : ``;
 
   const isRepeating = (repeatingDays) => Object.values(repeatingDays).some(Boolean);
 
@@ -196,8 +199,10 @@ export default class TaskEditFormComponent extends AbstractSmartComponent {
     this._isRepeatingTask = Object.values(task.repeatingDays).some(Boolean);
     this._currentRepeatingDays = Object.assign({}, task.repeatingDays);
 
+    this._flatpickr = null;
     this._formSubmitHandler = null;
     this._deleteButtonClickHandler = null;
+    this._applyFlatpickr();
     this._subscribeOnEvents();
   }
 
@@ -243,6 +248,25 @@ export default class TaskEditFormComponent extends AbstractSmartComponent {
 
   rerender() {
     super.rerender();
+
+    this._applyFlatpickr();
+  }
+
+  _applyFlatpickr() {
+    if (this._flatpickr) {
+      this._flatpickr.destroy();
+      this._flatpickr = null;
+    }
+
+    if (this._isDateShowing) {
+      const dateElement = this.getElement().querySelector(`.card__date`);
+
+      this._flatpickr = flatpickr(dateElement, {
+        altInput: true,
+        allowInput: true,
+        defaultDate: this._task.dueDate,
+      });
+    }
   }
 
   _subscribeOnEvents() {
