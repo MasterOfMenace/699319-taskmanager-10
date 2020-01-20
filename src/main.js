@@ -24,7 +24,15 @@ filterController.render();
 const boardComponent = new BoardComponent();
 const boardController = new BoardController(boardComponent, tasksModel);
 
-const statisticsComponent = new StatisticsComponent();
+// const statisticsComponent = new StatisticsComponent();
+
+const dateTo = new Date();
+const dateFrom = (() => {
+  const d = new Date(dateTo);
+  d.setDate(d.getDate() - 7);
+  return d;
+})();
+const statisticsComponent = new StatisticsComponent({tasks: tasksModel, dateFrom, dateTo});
 
 renderElement(pageControl, menuComponent, RenderPosition.BEFOREEND);
 renderElement(pageMain, boardComponent, RenderPosition.BEFOREEND);
