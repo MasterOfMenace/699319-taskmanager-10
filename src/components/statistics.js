@@ -40,7 +40,7 @@ const createRandomColor = () => {
 };
 
 const createPlaceholder = (dateFrom, dateTo) => {
-  return `${formatDate(dateFrom)} - ${formatDate(dateTo)}`;
+  return `${formatDate(dateFrom, `DD MMM`)} - ${formatDate(dateTo, `DD MMM`)}`;
 };
 
 const calcUniqCountColor = (tasks, color) => {
@@ -126,7 +126,7 @@ const renderDaysChart = (ctx, tasks, dateFrom, dateTo) => {
     return getTodayTasks(tasks, day);
   }).length;
 
-  const formattedDates = days.map((day) => formatDate(day));
+  const formattedDates = days.map((day) => formatDate(day, `DD MMM`));
 
   return new Chart(ctx, {
     plugins: [chartPluginDatalabels],
@@ -272,7 +272,7 @@ const createStatisticsTemplate = ({tasks, dateFrom, dateTo}) => {
           <input
             class="statistic__period-input"
             type="text"
-            placeholder=${placeholder}
+            placeholder="${placeholder}"
           />
         </div>
 
@@ -379,7 +379,6 @@ export default class StatisticsComponent extends AbstractSmartComponent {
     const dateInput = element.querySelector(`.statistic__period-input`);
 
     this._flatpickr = flatpickr(dateInput, {
-      altInput: true,
       allowInput: true,
       defaultDate: [this._dateFrom, this._dateTo],
       mode: `range`,
