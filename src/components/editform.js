@@ -71,7 +71,7 @@ const createTaskEditFormTemplate = (task, options = {}) => {
   const {isDateShowing, isRepeatingTask, currentRepeatingDays} = options;
   const isExpired = dueDate instanceof Date && dueDate < Date.now();
 
-  const date = (isDateShowing && dueDate) ? formatDate(dueDate) : ``;
+  const date = (isDateShowing && dueDate) ? formatDate(dueDate, `DD MMMM`) : ``;
   const time = (isDateShowing && dueDate) ? formatTime(dueDate) : ``;
 
   const isRepeating = (repeatingDays) => Object.values(repeatingDays).some(Boolean);
