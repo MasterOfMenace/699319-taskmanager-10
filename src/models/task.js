@@ -1,70 +1,37 @@
-import {FilterType} from '../constants';
-import {getTasksByFilter} from '../utils/filter';
-
-export default class TasksModel {
-  constructor() {
-    this._tasks = [];
-    this._activeFilterType = FilterType.ALL;
-    this._filterChangeHandlers = [];
-    this._dataChangeHandlers = [];
+export default class TaskModel {
+  constructor(data) {
+    this.id = data[`id`];
+    this.color = data[`color`];
+    this.description = data[`description`];
+    this.dueDate = data[`due_date`] ? new Date(data[`due_date`]) : null;
+    this.tags = new Set(data[`tags`]);
+    this.repeatingDays = data[`repeating_days`];
+    this.isArchived = Boolean(data[`is_archived`]);
+    this.isFavorite = Boolean(data[`is_favorite`]);
   }
 
-  getTasks() {
-    return getTasksByFilter(this._tasks, this._activeFilterType);
+  toRAW() {
+    return {
+      'id': this.id,
+      'color': this.color,
+      'description': this.description,
+      'due_date': this.dueDate ? this.dueDate.toISOString() : null,
+      'tags': Array.from(this.tags),
+      'repeating_days': this.repeatingDays,
+      'is_archived': this.isArchived,
+      'is_favorite': this.isFavorite,
+    };
   }
 
-  getTasksAll() {
-    return this._tasks;
+  static parseTask(data) {
+    return new TaskModel(data);
   }
 
-  setTasks(tasks) {
-    this._tasks = Array.from(tasks);
+  static parseTasks(data) {
+    return data.map(TaskModel.parseTask);
   }
 
-  setFilter(filterType) {
-    this._activeFilterType = filterType;
-    this._filterChangeHandlers.forEach((handler) => handler());
-  }
-
-  updateTask(id, task) {
-    const index = this._tasks.findIndex((it) => it.id === id);
-
-    if (index === -1) {
-      return false;
-    }
-
-    this._tasks = [].concat(this._tasks.slice(0, index), task, this._tasks.slice(index + 1));
-
-    this._dataChangeHandlers.forEach((handler) => handler());
-
-    return true;
-  }
-
-  addTask(task) {
-    this._tasks = [].concat(task, this._tasks);
-
-    this._dataChangeHandlers.forEach((handler) => handler());
-  }
-
-  removeTask(id) {
-    const index = this._tasks.findIndex((it) => it.id === id);
-
-    if (index === -1) {
-      return false;
-    }
-
-    this._tasks = [].concat(this._tasks.slice(0, index), this._tasks.slice(index + 1));
-
-    this._dataChangeHandlers.forEach((handler) => handler());
-
-    return true;
-  }
-
-  setFilterChangeHandler(handler) {
-    this._filterChangeHandlers.push(handler);
-  }
-
-  setDataChangeHandler(handler) {
-    this._dataChangeHandlers.push(handler);
+  static clone(data) {
+    return new TaskModel(data.toRAW());
   }
 }

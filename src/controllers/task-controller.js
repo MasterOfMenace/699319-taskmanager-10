@@ -1,7 +1,8 @@
 import {renderElement, RenderPosition, replace} from '../utils/render';
 import TaskComponent from "../components/card";
 import TaskEditFormComponent from "../components/editform";
-import {Colors} from '../constants';
+import {Colors, Days} from '../constants';
+import TaskModel from '../models/task';
 
 export const ViewMode = {
   ADDING: `adding`,
@@ -25,6 +26,28 @@ export const EmptyTask = {
   color: Colors[0],
   isFavorite: false,
   isArchive: false,
+};
+
+const parseFormData = (formData) => {
+  const repeatingDays = Days.reduce((acc, day) => {
+    acc[day] = false;
+    return acc;
+  }, {});
+
+  const date = formData.get(`date`);
+
+  return new TaskModel({
+    'description': formData.get(`text`),
+    'color': formData.get(`color`),
+    'tags': formData.getAll(`hashtag`),
+    'due_date': date ? new Date(date) : null,
+    'repeating_days': formData.getAll(`repeat`).reduce((acc, it) => {
+      acc[it] = true;
+      return acc;
+    }, repeatingDays),
+    'is_favorite': false,
+    'is_archived': false,
+  });
 };
 
 export default class TaskController {
@@ -56,7 +79,8 @@ export default class TaskController {
 
     const formSubmitHandler = (evt) => {
       evt.preventDefault();
-      const data = this._taskEditComponent.getData();
+      const formData = this._taskEditComponent.getData();
+      const data = parseFormData(formData);
       this._onDataChange(this, task, data);
     };
 
@@ -64,15 +88,15 @@ export default class TaskController {
     this._taskEditComponent.setFormSubmitHandler(formSubmitHandler);
 
     this._taskComponent.setArchiveButtonClickHandler(() => {
-      this._onDataChange(this, task, Object.assign({}, task, {
-        isArchive: !task.isArchive
-      }));
+      const newTask = TaskModel.clone(task);
+      newTask.isArchived = !newTask.isArchived;
+      this._onDataChange(this, task, newTask);
     });
 
     this._taskComponent.setFavoriteButtonClickHandler(() => {
-      this._onDataChange(this, task, Object.assign({}, task, {
-        isFavorite: !task.isFavorite
-      }));
+      const newTask = TaskModel.clone(task);
+      newTask.isFavorite = !newTask.isFavorite;
+      this._onDataChange(this, task, newTask);
     });
 
     this._taskEditComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, task, null));
