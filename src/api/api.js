@@ -28,9 +28,31 @@ export default class Api {
   }
 
   updateTask(id, data) {
-    return this._load({url: `tasks/${id}`, method: Method.PUT, body: JSON.stringify(data.toRAW()), headers: new Headers({'Content-Type': `application/json`})})
-    .then((response) => response.json())
-    .then((task) => TaskModel.parseTask(task));
+    return this._load({url: `tasks/${id}`,
+      method: Method.PUT,
+      body: JSON.stringify(data.toRAW()),
+      headers: new Headers({'Content-Type': `application/json`})
+    })
+      .then((response) => response.json())
+      .then((task) => TaskModel.parseTask(task));
+  }
+
+  createTask(data) {
+    return this._load({
+      url: `tasks`,
+      method: Method.POST,
+      body: JSON.stringify(data.toRAW()),
+      headers: new Headers({'Content-Type': `application/json`})
+    })
+      .then((response) => response.json())
+      .then((task) => TaskModel.parseTask(task));
+  }
+
+  deleteTask(id) {
+    return this._load({
+      url: `tasks/${id}`,
+      method: Method.DELETE
+    });
   }
 
   _load({url, method = Method.GET, body = null, headers = new Headers()}) {

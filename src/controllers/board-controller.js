@@ -152,17 +152,23 @@ export default class BoardController {
         this._renderTasks(this._tasksModel.getTasks().slice(0, this._showingTasksCount));
         this._renderLoadMoreButton();
       } else {
-        this._tasksModel.addTask(newData);
-        taskController.render(newData, ViewMode.DEFAULT);
+        this._api.createTask(newData)
+          .then((taskModel) => {
+            this._tasksModel.addTask(taskModel);
+            taskController.render(taskModel, ViewMode.DEFAULT);
 
-        this._showedTasksControllers = [].concat(taskController, this._showedTasksControllers);
-        this._showingTasksCount = this._showedTasksControllers.length;
+            this._showedTasksControllers = [].concat(taskController, this._showedTasksControllers);
+            this._showingTasksCount = this._showedTasksControllers.length;
+          });
       }
     } else if (newData === null) {
-      this._tasksModel.removeTask(oldData.id);
-      this._removeTasks();
-      this._renderTasks(this._tasksModel.getTasks().slice(0, this._showingTasksCount));
-      this._renderLoadMoreButton();
+      this._api.deleteTask(oldData.id)
+      .then(() => {
+        this._tasksModel.removeTask(oldData.id);
+        this._removeTasks();
+        this._renderTasks(this._tasksModel.getTasks().slice(0, this._showingTasksCount));
+        this._renderLoadMoreButton();
+      });
     } else {
       this._api.updateTask(oldData.id, newData)
       .then((taskModel) => {
