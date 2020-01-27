@@ -4,6 +4,8 @@ import TaskEditFormComponent from "../components/editform";
 import {Colors, Days} from '../constants';
 import TaskModel from '../models/task';
 
+const SHAKE_TIMEOUT = 600;
+
 export const ViewMode = {
   ADDING: `adding`,
   DEFAULT: `default`,
@@ -175,5 +177,20 @@ export default class TaskController {
     if (this._viewMode !== ViewMode.DEFAULT) {
       this._replaceEditToTask();
     }
+  }
+
+  shake() {
+    this._taskEditComponent.getElement().style.animation = `shake ${SHAKE_TIMEOUT / 1000}s`;
+    this._taskComponent.getElement().style.animation = `shake ${SHAKE_TIMEOUT / 1000}s`;
+
+    setTimeout(() => {
+      this._taskEditComponent.getElement().style.animation = ``;
+      this._taskComponent.getElement().style.animation = ``;
+
+      this._taskEditComponent.setData({
+        saveButtonText: `Save`,
+        deleteButtonText: `Delete`
+      });
+    }, SHAKE_TIMEOUT);
   }
 }
