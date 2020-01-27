@@ -92,8 +92,6 @@ const createTaskEditFormTemplate = (task, options = {}) => {
   const hashtagsMarkup = createHashtagsMarkup(tags);
 
   const {saveButtonText, deleteButtonText} = externalData;
-  // const deleteButtonText = externalData.deleteButtonText;
-  // const saveButtonText = externalData.saveButtonText;
 
   return (
     `<article class="card card--edit card--${color} ${repeatClass} ${deadlineClass}">
