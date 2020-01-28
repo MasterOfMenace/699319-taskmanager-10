@@ -51,7 +51,7 @@ const createRepeatingDaysMarkup = (days, repeatingDays) => {
 };
 
 const createHashtagsMarkup = (tags) => {
-  return Array.from(tags).map((tag) => {
+  return tags.map((tag) => {
     return (
       `<span class="card__hashtag-inner">
         <input
@@ -72,8 +72,8 @@ const createHashtagsMarkup = (tags) => {
 };
 
 const createTaskEditFormTemplate = (task, options = {}) => {
-  const {tags, dueDate, color} = task;
-  const {isDateShowing, isRepeatingTask, currentRepeatingDays, currentDescription, externalData} = options;
+  const {dueDate} = task;
+  const {color, tags, isDateShowing, isRepeatingTask, currentRepeatingDays, currentDescription, externalData} = options;
   const description = currentDescription;
   const isExpired = dueDate instanceof Date && dueDate < Date.now();
 
@@ -186,9 +186,11 @@ export default class TaskEditFormComponent extends AbstractSmartComponent {
     this._isDateShowing = !!task.dueDate;
     this._isRepeatingTask = Object.values(task.repeatingDays).some(Boolean);
     this._currentRepeatingDays = Object.assign({}, task.repeatingDays);
+    this._tags = Array.from(task.tags);
+    this._color = task.color;
+    this._currentDescription = task.description;
 
     this._externalData = ButtonsData;
-    this._currentDescription = task.description;
 
     this._flatpickr = null;
     this._formSubmitHandler = null;
@@ -199,6 +201,8 @@ export default class TaskEditFormComponent extends AbstractSmartComponent {
 
   getTemplate() {
     return createTaskEditFormTemplate(this._task, {
+      color: this._color,
+      tags: this._tags,
       isDateShowing: this._isDateShowing,
       isRepeatingTask: this._isRepeatingTask,
       currentRepeatingDays: this._currentRepeatingDays,
@@ -270,25 +274,48 @@ export default class TaskEditFormComponent extends AbstractSmartComponent {
   _subscribeOnEvents() {
     const element = this.getElement();
 
+    element.querySelector(`.card__colors-wrap`)
+      .addEventListener(`change`, (evt) => {
+        this._color = evt.target.value;
+        this.rerender();
+      });
+
+    element.querySelector(`.card__hashtag-list`)
+      .addEventListener(`click`, (evt) => {
+        if (evt.target.classList.contains(`card__hashtag-delete`)) {
+          const hashtagValue = evt.target.parentNode.firstElementChild.value;
+          const index = this._tags.findIndex((it) => it === hashtagValue);
+          this._tags = this._tags.slice(0, index).concat(this._tags.slice(index + 1));
+          this.rerender();
+        }
+      });
+
+    element.querySelector(`.card__hashtag-input`)
+      .addEventListener(`change`, (evt) => {
+        const newHashtag = evt.target.value;
+        this._tags.push(newHashtag);
+        this.rerender();
+      });
+
     element.querySelector(`.card__text`)
       .addEventListener(`input`, (evt) => {
         this._currentDescription = evt.target.value;
       });
 
     element.querySelector(`.card__date-deadline-toggle`).addEventListener(`click`, () => {
-      this.isDateShowing = !this.isDateShowing;
+      this._isDateShowing = !this._isDateShowing;
       this.rerender();
     });
 
     element.querySelector(`.card__repeat-toggle`).addEventListener(`click`, () => {
-      this.isRepeatingTask = !this.isRepeatingTask;
+      this._isRepeatingTask = !this._isRepeatingTask;
       this.rerender();
     });
 
     const repeatingDays = element.querySelector(`.card__repeat-days`);
     if (repeatingDays) {
       repeatingDays.addEventListener(`change`, (evt) => {
-        this.currentRepeatingDays[evt.target.value] = evt.target.checked;
+        this._currentRepeatingDays[evt.target.value] = evt.target.checked;
         this.rerender();
       });
     }
